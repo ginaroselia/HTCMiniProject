@@ -1,1 +1,3 @@
 # HTCMiniProject
+
+test_commit_for_different_branch
