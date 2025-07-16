@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Form = () => {
 	const [file, setFile] = useState(null);
 	const [id, setId] = useState('');
+
+	const navigate = useNavigate();
 
 	// Change the url
 	const BASE_URL = 'http://localhost:3000';
@@ -28,11 +31,11 @@ const Form = () => {
 				body: formData,
 			});
 			const result = await response.json();
-			console.log(result);
-			setFile(null);
-			e.target.reset();
+
+			navigate('/results', { state: { result } });
 		} catch (error) {
 			console.error(error);
+			alert('Upload failed. Please try again.');
 		}
 	};
 
@@ -49,10 +52,11 @@ const Form = () => {
 				body: JSON.stringify({ id }),
 			});
 			const result = await response.json();
-			console.log(result);
-			setId('');
+
+			navigate('/results', { state: { result } });
 		} catch (error) {
 			console.error(error);
+			alert('No result found for this ID.');
 		}
 	};
 
