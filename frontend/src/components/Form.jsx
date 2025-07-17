@@ -8,7 +8,7 @@ const Form = () => {
 	const navigate = useNavigate();
 
 	// Change the url
-	const BASE_URL = 'http://localhost:3000';
+	const BASE_URL = 'http://localhost:5000';
 
 	const handleImageChange = (e) => {
 		setFile(e.target.files[0]);
@@ -31,6 +31,7 @@ const Form = () => {
 				body: formData,
 			});
 			const result = await response.json();
+			console.log(result);
 
 			navigate('/results', { state: { result } });
 		} catch (error) {

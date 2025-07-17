@@ -15,8 +15,7 @@ const Resultpage = () => {
 		);
 	}
 
-	const { id, classification, confidence, detection, image_path } =
-		state.result;
+	const { id, prediction, confidence, detection, image_path } = state.result;
 
 	return (
 		<div style={{ padding: '2rem' }}>
@@ -25,10 +24,10 @@ const Resultpage = () => {
 			</h2>
 			<h2>🧠 Classification Result</h2>
 			<p>
-				<strong>Class:</strong> {classification}
+				<strong>Class:</strong> {prediction}
 			</p>
 			<p>
-				<strong>Confidence:</strong> {(confidence * 100).toFixed(2)}%
+				<strong>Confidence:</strong> {confidence}%
 			</p>
 
 			<h2>🎯 Object Detection</h2>
