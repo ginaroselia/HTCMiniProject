@@ -26,7 +26,7 @@ const Form = () => {
 		formData.append('image', file);
 
 		try {
-			const response = await fetch(`${BASE_URL}`, {
+			const response = await fetch(`${BASE_URL}/predict`, {
 				method: 'POST',
 				body: formData,
 			});

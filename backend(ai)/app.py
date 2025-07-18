@@ -20,15 +20,20 @@ def predict():
     file = request.files['image']
     img = Image.open(file.stream).convert('RGB')
     # img = img.resize((227, 227)) 
-    img = img.resize((64, 32)) 
-    img_array = np.array(img) / 255.0
+    img = img.resize((64, 32))
+    img_array = np.array(img)
     img_array = np.expand_dims(img_array, axis=0)
 
+    print("Input array shape:", img_array.shape, flush=True)
+    print("Input min/max:", img_array.min(), img_array.max(), flush=True)
+
     prediction = model.predict(img_array)[0]
+    
     print("Prediction vector:", prediction, flush=True)
     class_index = np.argmax(prediction)
     class_name = class_labels[class_index]
     confidence = float(prediction[class_index])
+    
 
     return jsonify({
         'prediction': class_name,

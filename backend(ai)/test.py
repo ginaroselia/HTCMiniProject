@@ -14,8 +14,8 @@ class_labels = ['Public Bank', 'Rototype', 'Standard Charted']
 # Loop through test images
 for img_file in ["pb.png", "roto.png", "sc.png"]:
     # img = Image.open(img_file).convert("RGB").resize((227, 227))
-    img = Image.open(img_file).convert("RGB").resize((64, 32)) # resnet size
-    img_array = np.array(img) / 255.0
+    img = Image.open(img_file).convert("RGB").resize((64, 32))
+    img_array = np.array(img)
     img_array = np.expand_dims(img_array, axis=0)
     
     prediction = model.predict(img_array)
