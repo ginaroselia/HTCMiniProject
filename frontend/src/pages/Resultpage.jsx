@@ -15,28 +15,25 @@ const Resultpage = () => {
 		);
 	}
 
-	const { id, prediction, confidence, detection, image_path } = state.result;
+	const { classification, detection } = state.result;
 
 	return (
 		<div style={{ padding: '2rem' }}>
-			<h2>
-				🧾 Result ID: <code>{id}</code>
-			</h2>
+			<h2>{/* 🧾 Result ID: <code>{id}</code> */}</h2>
 			<h2>🧠 Classification Result</h2>
 			<p>
-				<strong>Class:</strong> {prediction}
+				<strong>Class:</strong> {classification.prediction}
 			</p>
 			<p>
-				<strong>Confidence:</strong> {confidence}%
+				<strong>Confidence:</strong> {classification.confidence}%
 			</p>
 
 			<h2>🎯 Object Detection</h2>
-			{detection?.length > 0 ? (
+			{detection.objects.length > 0 ? (
 				<ul>
-					{detection.map((item, idx) => (
+					{detection.objects.map((item, idx) => (
 						<li key={idx}>
-							<strong>{item.class}</strong> —{' '}
-							{(item.confidence * 100).toFixed(1)}%
+							<strong>{item.label}</strong> — {item.confidence}%
 						</li>
 					))}
 				</ul>
@@ -44,11 +41,12 @@ const Resultpage = () => {
 				<p>No objects detected.</p>
 			)}
 
-			{image_path && (
+			{/* Image Section */}
+			{detection.image && (
 				<div style={{ marginTop: '1rem' }}>
 					<h3>🖼 Annotated Image</h3>
 					<img
-						src={image_path}
+						src={`data:image/jpeg;base64,${detection.image}`}
 						alt="Detection"
 						style={{ maxWidth: '100%', border: '1px solid #ccc' }}
 					/>
