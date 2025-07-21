@@ -1,13 +1,27 @@
+from dotenv import load_dotenv
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from keras.models import load_model
 import numpy as np
 from PIL import Image
+
 from ultralytics import YOLO
+from rfdetr import RFDETRBase
+
 import io
 import base64
 import cv2
 
+
+# Load environment variables for API keys (For Roboflow)
+load_dotenv()
+
+# Store keys in variables to be used in loading Roboflow DETR model
+hugging_face_key = os.getenv("HUGGING_FACE_API")
+roboflow_key = os.getenv("ROBOFLOW_API")
+
+# For initializing and configuring flask app itself
 app = Flask(__name__)
 CORS(app)
 
@@ -16,6 +30,8 @@ classification_model = load_model('resnet.h5')
 # classification_model = load_model('model13.keras')
 detection_model = YOLO('yolo1.pt')
 
+"""Load Roboflow"""
+roboflow_detection_model = RFDETRBase(pretrain_weights="roboflow-detr_checkpoint_best_total.pth")
 
 # Class labels for classification model
 class_labels = ['Public Bank', 'Rototype', 'Standard Charted']
@@ -74,6 +90,9 @@ def draw_detections(original_pil_img, results):
     return encoded_image
 
 
+
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'image' not in request.files:
@@ -93,6 +112,7 @@ def predict():
     confidence = float(prediction[class_index])
 
     # -------- DETECTION --------
+    """YOLO"""
     detection_results = detection_model.predict(original_img)
     detection_data = []
     for box in detection_results[0].boxes:
@@ -104,6 +124,11 @@ def predict():
             'confidence': round(score * 100, 2),
             'bbox': [round(coord, 2) for coord in bbox]
         })
+
+    """ROBOFLOW"""
+    # The predict for roboflow needs to put a threshold parameter value
+    test_prediction = detection_model.predict(test_image, threshold=0.5)
+
 
     # Get annotated image
     detected_img_base64 = draw_detections(original_img, detection_results)
