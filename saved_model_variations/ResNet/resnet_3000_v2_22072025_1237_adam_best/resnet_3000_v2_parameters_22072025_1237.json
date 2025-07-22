@@ -1,0 +1,13 @@
+{
+    "model_name": "resnet_3000_v2_22072025_1237",
+    "image_size": [
+        155,
+        330
+    ],
+    "batch_size": 32,
+    "optimizer": "adam",
+    "epochs": 300,
+    "patience": 10,
+    "learning_rate": 1e-06,
+    "test_accuracy": "94.50%"
+}
