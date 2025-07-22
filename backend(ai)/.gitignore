@@ -5,8 +5,5 @@ model13.keras
 detr.pth
 
 *.env
-<<<<<<< HEAD
 
-=======
->>>>>>> 9fba07d954d69c2651a300753454833e77f2cefb
 *.pth
