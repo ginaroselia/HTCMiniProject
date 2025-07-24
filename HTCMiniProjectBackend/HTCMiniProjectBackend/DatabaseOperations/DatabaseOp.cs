@@ -47,7 +47,7 @@ namespace HTCMiniProjectBackend.DatabaseOperations
 
         public string? GetNextQueue()
         {
-            string query = "SELECT id_code FROM request_queue WHERE status = 0 LIMIT 1";
+            string query = "SELECT id_code FROM request_queue WHERE status = 0 LIMIT 1 FOR UPDATE";
 
             using var cmd = new MySqlCommand(query, _conn);
             using var reader = cmd.ExecuteReader();
@@ -192,6 +192,15 @@ namespace HTCMiniProjectBackend.DatabaseOperations
             cmd.Parameters.AddWithValue("@type", type);
             cmd.Parameters.AddWithValue("@result", result);
             cmd.Parameters.AddWithValue("@confidence", confidence);
+            cmd.ExecuteNonQuery();
+        }
+        public void InsertResultImage(string queueId, string base64Image)
+        {
+            const string query = @"INSERT INTO request_result_image (q_id, image) VALUES (@queueId, @image);";
+
+            using var cmd = new MySqlCommand(query, _conn);
+            cmd.Parameters.AddWithValue("@queueId", queueId);
+            cmd.Parameters.AddWithValue("@image", base64Image);
             cmd.ExecuteNonQuery();
         }
     }

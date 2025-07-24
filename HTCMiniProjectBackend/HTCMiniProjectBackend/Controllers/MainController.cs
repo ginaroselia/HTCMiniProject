@@ -98,13 +98,11 @@ namespace HTCMiniProjectBackend.Controllers
                         break;
 
                     case 2: // Detection (may have multiple)
-                        string? json = row["result"].ToString();
-                        if (!string.IsNullOrEmpty(json))
+                        detectionObjects.Add(new
                         {
-                            var objects = System.Text.Json.JsonSerializer.Deserialize<List<object>>(json);
-                            if (objects != null)
-                                detectionObjects.AddRange(objects);
-                        }
+                            label = row["result"].ToString() ?? "",
+                            confidence = Convert.ToSingle(row["confidence"])
+                        });
                         break;
                 }
             }
@@ -112,7 +110,7 @@ namespace HTCMiniProjectBackend.Controllers
             var response = new
             {
                 classification = new
-                {
+                {   
                     prediction = className,
                     confidence = confidence
                 },

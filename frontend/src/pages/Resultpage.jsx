@@ -14,30 +14,35 @@ const Resultpage = () => {
 	useEffect(() => {
 		if (!queueId) return;
 
-		const pollInterval = 3000;
-		let polling;
+		let cancelled = false;
 
-		const fetchResult = async () => {
+		const poll = async () => {
 			try {
 				const res = await fetch(`http://localhost:5231/request_result?id=${queueId}`);
 				const data = await res.json();
 
-				if (data?.classification?.prediction) {
-					setResult(data);
-					setLoading(false);
-					clearInterval(polling);
+				if (!cancelled) {
+					if (data?.classification?.prediction) {
+						setResult(data);
+						setLoading(false);
+					} else {
+						// Try again after delay if result not ready
+						setTimeout(poll, 3000);
+					}
 				}
 			} catch (err) {
 				console.error(err);
-				setError("Failed to fetch result.");
-				clearInterval(polling);
+				if (!cancelled) {
+					setError("Failed to fetch result.");
+				}
 			}
 		};
 
-		polling = setInterval(fetchResult, pollInterval);
-		fetchResult();
+		poll(); // initial call
 
-		return () => clearInterval(polling);
+		return () => {
+			cancelled = true;
+		};
 	}, [queueId]);
 
 	if (!queueId) {
