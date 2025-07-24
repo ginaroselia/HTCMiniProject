@@ -3,6 +3,10 @@ __pycache__/
 *.pyc
 model13.keras
 detr.pth
+.venv/
+venv/
+.vs/
+env/
 
 *.env
 

@@ -8,7 +8,8 @@ const Form = () => {
 	const navigate = useNavigate();
 
 	// Change the url
-	const BASE_URL = 'http://localhost:5000';
+	const BASE_URL = 'http://localhost:5231';
+	//const BASE_URL = 'http://localhost:5000';
 
 	const handleImageChange = (e) => {
 		setFile(e.target.files[0]);
@@ -26,7 +27,8 @@ const Form = () => {
 		formData.append('image', file);
 
 		try {
-			const response = await fetch(`${BASE_URL}/predict`, {
+			const response = await fetch(`${BASE_URL}/upload_img`, {
+			//const response = await fetch(`${BASE_URL}/predict`, {
 				method: 'POST',
 				body: formData,
 			});
@@ -44,21 +46,7 @@ const Form = () => {
 	const handleIdSubmit = async (e) => {
 		e.preventDefault();
 
-		try {
-			const response = await fetch(`${BASE_URL}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ id }),
-			});
-			const result = await response.json();
-
-			navigate('/results', { state: { result } });
-		} catch (error) {
-			console.error(error);
-			alert('No result found for this ID.');
-		}
+		navigate('/results', { state: { result: { queueId: id } } });
 	};
 
 	return (

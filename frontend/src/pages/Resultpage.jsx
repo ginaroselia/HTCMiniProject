@@ -1,10 +1,76 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 const Resultpage = () => {
 	const { state } = useLocation();
 	const navigate = useNavigate();
 
-	if (!state || !state.result) {
+	const [result, setResult] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+
+	const queueId = state?.result?.queueId;
+
+	useEffect(() => {
+		if (!queueId) return;
+
+		const pollInterval = 3000;
+		let polling;
+
+		const fetchResult = async () => {
+			try {
+				const res = await fetch(`http://localhost:5231/request_result?id=${queueId}`);
+				const data = await res.json();
+
+				if (data?.classification?.prediction) {
+					setResult(data);
+					setLoading(false);
+					clearInterval(polling);
+				}
+			} catch (err) {
+				console.error(err);
+				setError("Failed to fetch result.");
+				clearInterval(polling);
+			}
+		};
+
+		polling = setInterval(fetchResult, pollInterval);
+		fetchResult();
+
+		return () => clearInterval(polling);
+	}, [queueId]);
+
+	if (!queueId) {
+		return (
+			<div style={{ padding: '2rem' }}>
+				<p>No result ID provided.</p>
+				<button className="back-button" onClick={() => navigate('/')}>
+					Back to Upload
+				</button>
+			</div>
+		);
+	}
+
+	if (loading) {
+		return (
+			<div style={{ padding: '2rem' }}>
+				<p>🔄 Waiting for result...</p>
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div style={{ padding: '2rem' }}>
+				<p>❌ {error}</p>
+				<button className="back-button" onClick={() => navigate('/')}>
+					Try Again
+				</button>
+			</div>
+		);
+	}
+
+	if (!result) {
 		return (
 			<div style={{ padding: '2rem' }}>
 				<p>No result found.</p>
@@ -15,11 +81,10 @@ const Resultpage = () => {
 		);
 	}
 
-	const { classification, detection } = state.result;
+	const { classification, detection } = result;
 
 	return (
 		<div style={{ padding: '2rem' }}>
-			<h2>{/* 🧾 Result ID: <code>{id}</code> */}</h2>
 			<h2>🧠 Classification Result</h2>
 			<p>
 				<strong>Class:</strong> {classification.prediction}
@@ -41,7 +106,6 @@ const Resultpage = () => {
 				<p>No objects detected.</p>
 			)}
 
-			{/* Image Section */}
 			{detection.image && (
 				<div style={{ marginTop: '1rem' }}>
 					<h3>🖼 Annotated Image</h3>
@@ -60,4 +124,5 @@ const Resultpage = () => {
 		</div>
 	);
 };
+
 export default Resultpage;

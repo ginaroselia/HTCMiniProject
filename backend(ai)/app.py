@@ -80,48 +80,27 @@ def predict():
         return jsonify({'error': 'No image uploaded'}), 400
 
     file = request.files['image']
-    original_img = Image.open(file.stream).convert('RGB')
-
-    # -------- CLASSIFICATION --------
-    resized_img = original_img.resize((64, 32))
-    # resized_img = original_img.resize((227, 227))
-    img_array = np.array(resized_img)
+    img = Image.open(file.stream).convert('RGB')
+    # img = img.resize((227, 227)) 
+    img = img.resize((64, 32))
+    img_array = np.array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    prediction = classification_model.predict(img_array)[0]
+
+    print("Input array shape:", img_array.shape, flush=True)
+    print("Input min/max:", img_array.min(), img_array.max(), flush=True)
+
+    prediction = model.predict(img_array)[0]
+    
+    print("Prediction vector:", prediction, flush=True)
     class_index = np.argmax(prediction)
     class_name = class_labels[class_index]
     confidence = float(prediction[class_index])
-
-    # -------- DETECTION --------
-    detection_results = detection_model.predict(original_img)
-    detection_data = []
-    for box in detection_results[0].boxes:
-        label = detection_model.names[int(box.cls)]
-        score = float(box.conf)
-        bbox = box.xyxy[0].tolist()
-        detection_data.append({
-            'id': int(box.cls),
-            'label': label,
-            'confidence': round(score * 100, 2),
-            'bbox': [round(coord, 2) for coord in bbox]
-        })
-
-    # Get annotated image
-    detected_img_base64 = draw_detections(original_img, detection_results)
+    
 
     return jsonify({
-        'classification': {
-            'prediction': class_name,
-            'confidence': round(confidence * 100, 2)
-        },
-        'detection': {
-            'objects': detection_data,
-            'image': detected_img_base64
-        }
+        'prediction': class_name,
+        'confidence': round(confidence * 100, 2)
     })
-
 
 if __name__ == '__main__':
     app.run(port=5000)
-
-

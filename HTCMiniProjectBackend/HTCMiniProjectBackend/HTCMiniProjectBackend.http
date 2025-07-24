@@ -1,0 +1,6 @@
+@HTCMiniProjectBackend_HostAddress = http://localhost:5231
+
+GET {{HTCMiniProjectBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
