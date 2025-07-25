@@ -4,7 +4,7 @@ using DB = HTCMiniProjectBackend.DatabaseOperations.DatabaseOp;
 namespace HTCMiniProjectBackend.Controllers
 {
     [ApiController]
-    public class MainController : ControllerBase
+    public class MainController : ControllerBase 
     {
         [HttpPost("upload_img")]
         public async Task<IActionResult> UploadImage(IFormFile image)
@@ -17,9 +17,14 @@ namespace HTCMiniProjectBackend.Controllers
             if (!allowedTypes.Contains(image.ContentType.ToLower()))
                 return BadRequest("Only image files are allowed.");
 
-            var db = new DB();
-            string imageUrl = db.GetConfig("imagePath");
-            
+            using var db = new DB();
+            string? imageUrl = db.GetConfig("imagePath");
+
+            if (string.IsNullOrWhiteSpace(imageUrl))
+            {
+                return BadRequest("Missing configuration. Please contact the administrator.");
+            }
+
             // Ensure folder exists
             if (!Directory.Exists(imageUrl))
                 Directory.CreateDirectory(imageUrl);
@@ -67,7 +72,7 @@ namespace HTCMiniProjectBackend.Controllers
         [HttpGet("request_result")]
         public IActionResult RequestResult(string id)
         {
-            var db = new DB();
+            using var db = new DB();
 
             int processed = db.CheckQueueStatus(id);
 

@@ -11,7 +11,7 @@ namespace HTCMiniProjectBackend.Controllers
         [HttpGet("next_job")]
         public IActionResult GetNextPendingJob()
         {
-            var db = new DB();
+            using var db = new DB();
             var trans = db.StartTransaction();
 
             try
@@ -98,7 +98,7 @@ namespace HTCMiniProjectBackend.Controllers
         [HttpPost("submit_result")]
         public IActionResult SubmitResult([FromBody] JsonElement body)
         {
-            var db = new DB(); // instance-based DB handler
+            using var db = new DB(); // instance-based DB handler
             var trans = db.StartTransaction(); // manually start transaction
 
             try

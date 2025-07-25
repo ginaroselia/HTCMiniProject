@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 namespace HTCMiniProjectBackend.DatabaseOperations
 {
 
-    public class DatabaseOp
+    public class DatabaseOp: IDisposable
     {
         private MySqlConnection? _conn;
         private MySqlTransaction? trans;
@@ -16,6 +16,19 @@ namespace HTCMiniProjectBackend.DatabaseOperations
             var connection = new MySqlConnection(dbConnect);
             connection.Open();
             _conn = connection;
+        }
+
+        public void Dispose()
+        {
+            trans?.Dispose();
+
+            if (_conn != null)
+            {
+                if (_conn.State != System.Data.ConnectionState.Closed)
+                    _conn.Close();
+
+                _conn.Dispose();
+            }
         }
 
         public bool InsertQueue(string id)
