@@ -18,11 +18,18 @@ const Resultpage = () => {
 
 		const poll = async () => {
 			try {
-				const res = await fetch(`http://localhost:5231/request_result?id=${queueId}`);
+				const res = await fetch(
+					`http://localhost:5231/request_result?id=${queueId}`
+				);
 				const data = await res.json();
 
+				console.log('API response:', data);
+
 				if (!cancelled) {
-					if (data?.classification?.prediction) {
+					if (data?.message === 'ID not found!') {
+						setError('ID not found.');
+						setLoading(false);
+					} else if (data?.classification?.prediction) {
 						setResult(data);
 						setLoading(false);
 					} else {
@@ -33,7 +40,8 @@ const Resultpage = () => {
 			} catch (err) {
 				console.error(err);
 				if (!cancelled) {
-					setError("Failed to fetch result.");
+					setError('Failed to fetch result.');
+					setLoading(false);
 				}
 			}
 		};
@@ -47,41 +55,49 @@ const Resultpage = () => {
 
 	if (!queueId) {
 		return (
-			<div style={{ padding: '2rem' }}>
-				<p>No result ID provided.</p>
-				<button className="back-button" onClick={() => navigate('/')}>
-					Back to Upload
-				</button>
+			<div className="result-container-rp">
+				<div className="result-card-rp">
+					<p>No result ID provided.</p>
+					<button className="back-button" onClick={() => navigate('/')}>
+						Back to Upload
+					</button>
+				</div>
 			</div>
 		);
 	}
 
 	if (loading) {
 		return (
-			<div style={{ padding: '2rem' }}>
-				<p>🔄 Waiting for result...</p>
+			<div className="result-container-rp">
+				<div className="result-card-rp">
+					<p>🔄 Waiting for result...</p>
+				</div>
 			</div>
 		);
 	}
 
 	if (error) {
 		return (
-			<div style={{ padding: '2rem' }}>
-				<p>❌ {error}</p>
-				<button className="back-button" onClick={() => navigate('/')}>
-					Try Again
-				</button>
+			<div className="result-container-rp">
+				<div className="result-card-rp">
+					<p>{error}</p>
+					<button className="back-button" onClick={() => navigate('/')}>
+						Try Again
+					</button>
+				</div>
 			</div>
 		);
 	}
 
 	if (!result) {
 		return (
-			<div style={{ padding: '2rem' }}>
-				<p>No result found.</p>
-				<button className="back-button" onClick={() => navigate('/')}>
-					Back to Upload
-				</button>
+			<div className="result-container-rp">
+				<div className="result-card-rp">
+					<p>No result found.</p>
+					<button className="back-button" onClick={() => navigate('/')}>
+						Back to Upload
+					</button>
+				</div>
 			</div>
 		);
 	}
@@ -89,43 +105,46 @@ const Resultpage = () => {
 	const { classification, detection } = result;
 
 	return (
-		<div style={{ padding: '2rem' }}>
-			<h2>🧠 Classification Result</h2>
-			<p>
-				<strong>Class:</strong> {classification.prediction}
-			</p>
-			<p>
-				<strong>Confidence:</strong> {classification.confidence}%
-			</p>
+		<div className="result-container-rp">
+			<div className="result-card-rp">
+				<h2>Result ID: {queueId}</h2>
+				<h3>📊 Classification Result</h3>
+				<p>
+					<strong>Class:</strong> {classification.prediction}
+				</p>
+				<p>
+					<strong>Confidence:</strong> {classification.confidence}%
+				</p>
 
-			<h2>🎯 Object Detection</h2>
-			{detection.objects.length > 0 ? (
-				<ul>
-					{detection.objects.map((item, idx) => (
-						<li key={idx}>
-							<strong>{item.label}</strong> — {item.confidence}%
-						</li>
-					))}
-				</ul>
-			) : (
-				<p>No objects detected.</p>
-			)}
+				<h3>🎯 Object Detection</h3>
+				{detection.objects.length > 0 ? (
+					<ul>
+						{detection.objects.map((item, idx) => (
+							<li key={idx}>
+								<strong>{item.label}</strong> — {item.confidence}%
+							</li>
+						))}
+					</ul>
+				) : (
+					<p>No objects detected.</p>
+				)}
 
-			{detection.image && (
-				<div style={{ marginTop: '1rem' }}>
-					<h3>🖼 Annotated Image</h3>
-					<img
-						src={`data:image/jpeg;base64,${detection.image}`}
-						alt="Detection"
-						style={{ maxWidth: '100%', border: '1px solid #ccc' }}
-					/>
-				</div>
-			)}
+				{detection.image && (
+					<div>
+						<h3>Annotated Image</h3>
+						<img
+							src={`data:image/jpeg;base64,${detection.image}`}
+							alt="Detection"
+							className="detection-image-rp"
+						/>
+					</div>
+				)}
 
-			<br />
-			<button className="back-button" onClick={() => navigate('/')}>
-				🔙 Upload Another
-			</button>
+				<br />
+				<button className="back-button" onClick={() => navigate('/')}>
+					🔙 Upload Another
+				</button>
+			</div>
 		</div>
 	);
 };
