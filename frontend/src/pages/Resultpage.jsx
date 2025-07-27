@@ -2,34 +2,50 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const Resultpage = () => {
+	// Get the state passed from Form page (when using navigate('/results', { state }))
 	const { state } = useLocation();
+
+	// Hook that allows us to go back to the upload page
 	const navigate = useNavigate();
 
+	// State variables to store result data, loading status, and error messages
 	const [result, setResult] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
+	// Get the queueId passed from the Form page
+	// This ID is used to fetch the result from the backend
 	const queueId = state?.result?.queueId;
 
+	// This useEffect runs when the page loads (or when queueId changes)
 	useEffect(() => {
+		// If there is no queueId, return
 		if (!queueId) return;
 
+		// Use to stop polling if component unmounts
 		let cancelled = false;
 
+		// Define a function to keep checking backend for result
 		const poll = async () => {
 			try {
+				// Send request to backend with the queueId
 				const res = await fetch(
 					`http://localhost:5231/request_result?id=${queueId}`
 				);
+
+				// Convert the response to JSON
 				const data = await res.json();
 
-				console.log('API response:', data);
+				console.log('API response:', data); // Log result for debugging
 
 				if (!cancelled) {
+					// If backend says ID is not found, show error
 					if (data?.message === 'ID not found!') {
 						setError('ID not found.');
 						setLoading(false);
-					} else if (data?.classification?.prediction) {
+					}
+					// If classification result is available, set the result and stop loading
+					if (data?.classification?.prediction) {
 						setResult(data);
 						setLoading(false);
 					} else {
@@ -38,6 +54,7 @@ const Resultpage = () => {
 					}
 				}
 			} catch (err) {
+				// Handle any error that occurs while fetching
 				console.error(err);
 				if (!cancelled) {
 					setError('Failed to fetch result.');
@@ -46,13 +63,15 @@ const Resultpage = () => {
 			}
 		};
 
-		poll(); // initial call
+		poll(); // Start polling immediately when page loads
 
+		// Cleanup: If user leaves the page, stop polling
 		return () => {
 			cancelled = true;
 		};
-	}, [queueId]);
+	}, [queueId]); // Rerun if queueId changes
 
+	// If no queueId is passed, show message and back button
 	if (!queueId) {
 		return (
 			<div className="result-container-rp">
@@ -66,6 +85,7 @@ const Resultpage = () => {
 		);
 	}
 
+	// Show loading message, while waiting for result
 	if (loading) {
 		return (
 			<div className="result-container-rp">
@@ -76,6 +96,7 @@ const Resultpage = () => {
 		);
 	}
 
+	// If there is an error, show error message
 	if (error) {
 		return (
 			<div className="result-container-rp">
@@ -89,6 +110,7 @@ const Resultpage = () => {
 		);
 	}
 
+	// If no error and not loading, but still no result
 	if (!result) {
 		return (
 			<div className="result-container-rp">

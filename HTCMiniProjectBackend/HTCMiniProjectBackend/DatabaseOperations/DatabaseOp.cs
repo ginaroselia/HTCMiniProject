@@ -13,6 +13,7 @@ namespace HTCMiniProjectBackend.DatabaseOperations
         public DatabaseOp()
         {
             string dbConnect = "Server=localhost;Port=3306;Database=htcproject;Uid=root;Pwd=password";
+
             var connection = new MySqlConnection(dbConnect);
             connection.Open();
             _conn = connection;

@@ -1,8 +1,8 @@
 venv/
 __pycache__/
 *.pyc
-model13.keras
-detr.pth
+models/DETR/detr.pth
+
 .venv/
 venv/
 .vs/
@@ -10,4 +10,4 @@ env/
 
 *.env
 
-*.pth
+*.pths
