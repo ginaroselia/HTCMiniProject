@@ -8,7 +8,7 @@ CREATE TABLE `config` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `config` VALUES (1,'ImagePath','string','C:\\PathNameHere','2025-07-20 22:17:54','2025-07-20 22:17:54');
+INSERT INTO `config` VALUES (1,'ImagePath','string','C:\\PathNameHere ','2025-07-20 22:17:54','2025-07-20 22:17:54');
 
 CREATE TABLE `request_queue` (
   `id_code` int AUTO_INCREMENT NOT NULL,
@@ -45,3 +45,9 @@ CREATE TABLE `request_url` (
   PRIMARY KEY (`q_id`,`type`),
   CONSTRAINT `url_queue_id` FOREIGN KEY (`q_id`) REFERENCES `request_queue` (`id_code`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE `htcproject`.`request_result` 
+ADD COLUMN `ai_model` INT NULL DEFAULT 0 AFTER `confidence`,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`q_id`, `type`, `result`);
+;

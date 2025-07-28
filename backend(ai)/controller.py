@@ -241,7 +241,7 @@ def process_image(img):
 
 
 
-def post_result(queue_id, result):
+def post_result(queue_id, result, worker_id):
     """Send the processed result back to the C# server"""
     payload = {
         "queueId": queue_id,
@@ -252,7 +252,8 @@ def post_result(queue_id, result):
         "detection": {
             "objects": result["objects"],
             "image": result["image"]
-        }
+        },
+        "worker_id": worker_id
     }
     try:
         # Send result to /submit_result endpoint
@@ -274,7 +275,7 @@ def worker_loop(worker_id):
             print(f"⏳ Worker {worker_id} processing...")
             result = process_image(job["image"]) # Analyze the image
             print(f"⏳ Worker {worker_id} returning result...")
-            post_result(job["queueId"], result) # Send back result
+            post_result(job["queueId"], result, worker_id) # Send back result
         else:
             print(f"⏳ Worker {worker_id} waiting...")  # No job, sleep and try later
         time.sleep(3) # Wait 3 seconds before asking again
