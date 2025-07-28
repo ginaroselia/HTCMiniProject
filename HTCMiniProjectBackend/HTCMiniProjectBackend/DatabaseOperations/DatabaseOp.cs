@@ -32,20 +32,19 @@ namespace HTCMiniProjectBackend.DatabaseOperations
             }
         }
 
-        public bool InsertQueue(string id)
+        public int InsertQueue()
         {
             // insert data into queue
             string query = "INSERT INTO `request_queue` " +
-                "(`id_code`, `type`, `status`) VALUES " +
-                "(@id_code, '0', '0');";
+                "(`type`, `status`) VALUES " +
+                "('0', '0');";
 
             using var cmd = new MySqlCommand(query, _conn, trans);
-            cmd.Parameters.AddWithValue("@id_code", id);
             cmd.ExecuteNonQuery();
-            return true;
+            return Convert.ToInt32(cmd.LastInsertedId);
         }
 
-        public bool InsertUrl(string id, string imageUrl)
+        public bool InsertUrl(int id, string imageUrl)
         {
             // insert data into url
             string query = "INSERT INTO `request_url` " +
@@ -102,7 +101,7 @@ namespace HTCMiniProjectBackend.DatabaseOperations
                 return reader.GetString(0);
             }
 
-            return null; //
+            return ""; //
         }
 
         public MySqlTransaction StartTransaction()
@@ -114,7 +113,7 @@ namespace HTCMiniProjectBackend.DatabaseOperations
             return trans = _conn.BeginTransaction();
         }
 
-        public List<Dictionary<string, object>> GetQueueResult(string queueId)
+        public List<Dictionary<string, object>> GetQueueResult(int queueId)
         {
             string query = "SELECT * FROM request_result WHERE q_id = @qId";
             using var cmd = new MySqlCommand(query, _conn);
@@ -140,7 +139,7 @@ namespace HTCMiniProjectBackend.DatabaseOperations
 
             return results;
         }
-        public int CheckQueueStatus(string queueId)
+        public int CheckQueueStatus(int queueId)
         {
             const string query = "SELECT status FROM request_queue WHERE id_code = @qId";
             using var cmd = new MySqlCommand(query, _conn);
@@ -157,7 +156,7 @@ namespace HTCMiniProjectBackend.DatabaseOperations
         }
 
 
-        public string? GetResultImage(string queueId)
+        public string? GetResultImage(int queueId)
         {
             const string query = "SELECT image FROM request_result_image WHERE q_id = @qId";
             using var cmd = new MySqlCommand(query, _conn);
@@ -189,7 +188,10 @@ namespace HTCMiniProjectBackend.DatabaseOperations
 
         public int updateQueueStatus(string queueId, int status)
         {
-            string query = "Update request_queue SET status = @status where id_code = @id";
+            string query = "Update request_queue SET status = @status," +
+                " completed_date = CASE WHEN @status = 1 THEN CURRENT_TIMESTAMP" +
+                " ELSE completed_date END" +
+                " where id_code = @id";
             using var cmd = new MySqlCommand(query, _conn);
             cmd.Parameters.AddWithValue("@id", queueId);
             cmd.Parameters.AddWithValue("@status", status);

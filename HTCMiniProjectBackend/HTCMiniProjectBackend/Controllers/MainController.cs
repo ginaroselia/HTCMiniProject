@@ -45,14 +45,13 @@ namespace HTCMiniProjectBackend.Controllers
             var trans = db.StartTransaction();
             try
             {
-                string id = Modules.Functions.GenerateIDCode();
-                db.InsertQueue(id);
+                int id = db.InsertQueue();
                 db.InsertUrl(id, newFileName);
                 trans.Commit();
                 return Ok(
                     new { 
                         message = "Upload successful", 
-                        queueId = id,
+                        queueId = Modules.Functions.GenerateIDCode(id),
                         path = savePath,
                         imgName = newFileName
                     });
@@ -74,7 +73,10 @@ namespace HTCMiniProjectBackend.Controllers
         {
             using var db = new DB();
 
-            int processed = db.CheckQueueStatus(id);
+            string numberPart = id.Substring(2);
+            int idNumber = int.Parse(numberPart);
+
+            int processed = db.CheckQueueStatus(idNumber);
 
             if ( processed == -1 || processed == 9)
             {
@@ -84,8 +86,8 @@ namespace HTCMiniProjectBackend.Controllers
                 return Ok(new { message = "Request Processing!" });
             }
 
-            var results = db.GetQueueResult(id);
-            var resultImage = db.GetResultImage(id);
+            var results = db.GetQueueResult(idNumber);
+            var resultImage = db.GetResultImage(idNumber);
 
             string className = "";
             float confidence = 0f;

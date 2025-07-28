@@ -4,22 +4,9 @@ namespace HTCMiniProjectBackend.Modules
 {
     public class Functions
     {
-        public static string GenerateIDCode()
+        public static string GenerateIDCode(int id)
         {
-            var db = new DB();
-            string queueId = db.GetLatestQueueID();
-            string newQueueId;
-            if (queueId == "")
-            {
-                newQueueId = "ID00001";
-            }
-            else
-            {
-                int numberPart = int.Parse(queueId.Substring(2));
-                numberPart++;
-                newQueueId = "ID" + numberPart.ToString("D5"); // Ensures 5-digit padding
-            }
-            return newQueueId;
+            return "ID" + id.ToString("D5"); ;
         }
     }
 }
