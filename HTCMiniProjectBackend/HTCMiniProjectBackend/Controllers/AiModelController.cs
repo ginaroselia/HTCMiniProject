@@ -35,7 +35,7 @@ namespace HTCMiniProjectBackend.Controllers
 
                 if (string.IsNullOrWhiteSpace(imagePath))
                 {
-                    db.updateQueueStatus(job, 9);
+                    db.UpdateQueueStatus(job, 9);
                     trans.Commit(); // update still happened
                     return BadRequest(new { error = "Image path not found in DB." });
                 }
@@ -50,7 +50,7 @@ namespace HTCMiniProjectBackend.Controllers
                 }
                 catch (Exception ex)
                 {
-                    db.updateQueueStatus(job, 9);
+                    db.UpdateQueueStatus(job, 9);
                     trans.Commit();
                     Console.WriteLine($"❌ Cannot read file: {ex.Message}");
                     return BadRequest(new { error = "Cannot read image file.", details = ex.Message });
@@ -58,7 +58,7 @@ namespace HTCMiniProjectBackend.Controllers
 
                 if (!System.IO.File.Exists(imagePath))
                 {
-                    db.updateQueueStatus(job, 9);
+                    db.UpdateQueueStatus(job, 9);
                     trans.Commit();
                     Console.WriteLine("❌ Image file not found.");
                     return BadRequest(new { error = "Image file not found." });
@@ -71,12 +71,12 @@ namespace HTCMiniProjectBackend.Controllers
                 }
                 catch (Exception ex)
                 {
-                    db.updateQueueStatus(job, 9);
+                    db.UpdateQueueStatus(job, 9);
                     trans.Commit(); // still update the queue status
                     return StatusCode(500, new { error = "Failed to load image.", details = ex.Message });
                 }
 
-                db.updateQueueStatus(job, 2); // ✅ now marked as processing
+                db.UpdateQueueStatus(job, 2); // ✅ now marked as processing
                 trans.Commit(); // ✅ everything succeeded
 
                 string base64Image = Convert.ToBase64String(imageBytes);
@@ -121,7 +121,7 @@ namespace HTCMiniProjectBackend.Controllers
                 // Optional: cap confidence to 100
                 if (classConfidence > 100) classConfidence = 100;
 
-                db.updateQueueStatus(queueId, 1); // mark as completed
+                db.UpdateQueueStatus(queueId, 1); // mark as completed
                 Console.WriteLine($"🔸 Classification => Label: {prediction}, Confidence: {classConfidence}");
                 db.InsertResult(queueId, 1, prediction, classConfidence); // Type 1 = Classification
 
