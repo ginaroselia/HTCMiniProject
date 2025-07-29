@@ -17,25 +17,24 @@ from rfdetr import RFDETRBase # For using DETR object detection model
 from dotenv import load_dotenv
 
 # Load environment variables for API keys
-# load_dotenv()
+load_dotenv()
 
 # Store keys in variables (if needed later)
-# hugging_face_key = os.getenv("HUGGING_FACE_API")
-# roboflow_key = os.getenv("ROBOFLOW_API")
+os.getenv("HUGGING_FACE_API")
+os.getenv("ROBOFLOW_API")
 
 # Load the classification and detection models once globally
-classification_model = load_model("models/ResNet/resnet.h5")
-# classification_model = load_model("models/ResNet/resnet3000v2220720251237goodoverall.h5")
+classification_model = load_model("models/ResNet/resnet3000v2220720251237goodoverall.h5")
 
 
 # YOLO
 # detection_model = YOLO('models/YOLO/yolo5.pt') 
 
 # DETR
-detection_model = RFDETRBase(pretrain_weights="models/DETR/detr.pth")
+detection_model = RFDETRBase(pretrain_weights="models/DETR/checkpoint_best_total_test.pth")
 
 # Labels for classification results
-class_labels = ['Public Bank', 'Rototype', 'Standard Charted'] 
+class_labels = ['Public Bank', 'Rototype', 'Standard Chartered'] 
 
 # URL of the backend API (C# server)
 C_SHARP_API_BASE = "http://localhost:5231"  
@@ -182,7 +181,7 @@ def process_image(img):
     print("🧠 Running classification and detection...")
 
     # -------- CLASSIFICATION --------
-    resized_img = img.resize((64, 32)) # Resize image for model
+    resized_img = img.resize((330, 155)) # Resize image for model
     img_array = np.array(resized_img)
     img_array = np.expand_dims(img_array, axis=0) # Add batch dimension
         
