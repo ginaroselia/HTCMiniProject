@@ -1,5 +1,6 @@
 ﻿import requests # For making HTTP requests to the C# backend
 import time # For adding delays between tasks
+from datetime import datetime
 import os # For file and system-related tasks
 from PIL import Image # For working with images
 from io import BytesIO # For reading/writing 
@@ -241,7 +242,7 @@ def process_image(img):
 
 
 
-def post_result(queue_id, result, worker_id):
+def post_result(queue_id, result, worker_id, start_time, end_time):
     """Send the processed result back to the C# server"""
     payload = {
         "queueId": queue_id,
@@ -253,7 +254,11 @@ def post_result(queue_id, result, worker_id):
             "objects": result["objects"],
             "image": result["image"]
         },
-        "worker_id": worker_id
+        "worker_id": worker_id,
+        "log": {
+            "start_time": start_time,
+            "end_time": end_time
+        }
     }
     try:
         # Send result to /submit_result endpoint
@@ -273,9 +278,18 @@ def worker_loop(worker_id):
         job = fetch_next_job() # Ask server for new job
         if job:
             print(f"⏳ Worker {worker_id} processing...")
-            result = process_image(job["image"]) # Analyze the image
+
+            # Record start time
+            start_time = datetime.utcnow().isoformat()
+
+            result = process_image(job["image"])  # Analyze the image
+
+            # Record end time
+            end_time = datetime.utcnow().isoformat()
+
             print(f"⏳ Worker {worker_id} returning result...")
-            post_result(job["queueId"], result, worker_id) # Send back result
+            post_result(job["queueId"], result, worker_id, start_time, end_time)  # Send back result
+         
         else:
             print(f"⏳ Worker {worker_id} waiting...")  # No job, sleep and try later
         time.sleep(3) # Wait 3 seconds before asking again

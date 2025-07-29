@@ -46,8 +46,21 @@ CREATE TABLE `request_url` (
   CONSTRAINT `url_queue_id` FOREIGN KEY (`q_id`) REFERENCES `request_queue` (`id_code`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-ALTER TABLE `htcproject`.`request_result` 
+ALTER TABLE `request_result` 
 ADD COLUMN `ai_model` INT NULL DEFAULT 0 AFTER `confidence`,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`q_id`, `type`, `result`);
 ;
+
+CREATE TABLE `request_log` (
+  `id` INT NOT NULL,
+  `model_id` INT NULL DEFAULT 0,
+  `q_id` INT NULL,
+  `start_time` DATETIME NULL,
+  `end_time` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `ai_q_id`
+    FOREIGN KEY (`id`)
+    REFERENCES `request_queue` (`id_code`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION);

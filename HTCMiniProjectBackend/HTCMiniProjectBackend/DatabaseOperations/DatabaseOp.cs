@@ -165,5 +165,18 @@ namespace HTCMiniProjectBackend.DatabaseOperations
             cmd.Parameters.AddWithValue("@image", base64Image);
             cmd.ExecuteNonQuery();
         }
+
+        public void InsertInferenceLog(string queueId, string? workerId, DateTime startTime, DateTime endTime)
+        {
+            const string query = @"INSERT INTO request_log (q_id, worker_id, start_time, end_time)
+                           VALUES (@queueId, @workerId, @startTime, @endTime);";
+
+            using var cmd = new MySqlCommand(query, _conn, trans);
+            cmd.Parameters.AddWithValue("@queueId", queueId);
+            cmd.Parameters.AddWithValue("@workerId", workerId ?? "-1");
+            cmd.Parameters.AddWithValue("@startTime", startTime);
+            cmd.Parameters.AddWithValue("@endTime", endTime);
+            cmd.ExecuteNonQuery();
+        }
     }
 }
