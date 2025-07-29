@@ -64,3 +64,22 @@ CREATE TABLE `request_log` (
     REFERENCES `request_queue` (`id_code`)
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);
+
+ALTER TABLE `htcproject`.`request_result_image` 
+CHANGE COLUMN `image` `image` MEDIUMTEXT NULL DEFAULT NULL ;
+
+ALTER TABLE `htcproject`.`request_log` 
+DROP FOREIGN KEY `ai_q_id`;
+ALTER TABLE `htcproject`.`request_log` 
+CHANGE COLUMN `id` `id` INT NOT NULL AUTO_INCREMENT ;
+ALTER TABLE `htcproject`.`request_log` 
+ADD INDEX `ai_q_id_idx` (`q_id` ASC) VISIBLE;
+;
+ALTER TABLE `htcproject`.`request_log` 
+ADD CONSTRAINT `ai_q_id`
+  FOREIGN KEY (`q_id`)
+  REFERENCES `htcproject`.`request_queue` (`id_code`)
+  ON DELETE RESTRICT
+  ON UPDATE NO ACTION;
+
+
