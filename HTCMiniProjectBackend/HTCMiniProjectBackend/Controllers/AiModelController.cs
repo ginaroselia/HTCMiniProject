@@ -157,7 +157,7 @@ namespace HTCMiniProjectBackend.Controllers
 
                 if (body.TryGetProperty("log", out JsonElement log))
                 {
-                    string? workerId = body.TryGetProperty("worker_id", out JsonElement wid) ? wid.GetString() : null;
+                    int? workerId = body.TryGetProperty("worker_id", out JsonElement wid) ? wid.GetInt32() : null;
                     DateTime startTime = log.GetProperty("start_time").GetDateTime();
                     DateTime endTime = log.GetProperty("end_time").GetDateTime();
                     db.InsertInferenceLog(queueId, workerId, startTime, endTime);
