@@ -49,7 +49,9 @@ const Form = () => {
 		} catch (error) {
 			// If something goes wrong, show an error
 			console.error(error);
-			alert('Upload failed. Please try again.');
+			alert(
+				'Error uploading file: Only PNG, JPEG, GIF, or WEBP formats are supported.'
+			);
 		}
 	};
 
