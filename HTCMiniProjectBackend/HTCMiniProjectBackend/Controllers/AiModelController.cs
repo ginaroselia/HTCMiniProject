@@ -155,6 +155,14 @@ namespace HTCMiniProjectBackend.Controllers
                     }
                 }
 
+                if (body.TryGetProperty("log", out JsonElement log))
+                {
+                    string? workerId = body.TryGetProperty("worker_id", out JsonElement wid) ? wid.GetString() : null;
+                    DateTime startTime = log.GetProperty("start_time").GetDateTime();
+                    DateTime endTime = log.GetProperty("end_time").GetDateTime();
+                    db.InsertInferenceLog(queueId, workerId, startTime, endTime);
+                }
+
                 trans.Commit(); // ✅ All successful
                 Console.WriteLine("✅ Results inserted and committed successfully.");
                 return Ok(new { message = "Results saved." });
